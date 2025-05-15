@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import UserService from "../services/user.service";
+import UserService from "../services/org.service";
 import EventBus from "../common/EventBus";
 
 export default class BoardModerator extends Component {

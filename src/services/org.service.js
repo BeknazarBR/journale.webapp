@@ -1,11 +1,16 @@
 import axios from 'axios';
 import authHeader from './auth-header';
 
-const API_URL = 'http://localhost:8080/api/test/';
+const API_URL = 'http://localhost:3000/organizations';
 
-class UserService {
-  getPublicContent() {
-    return axios.get(API_URL + 'all');
+class OrgService {
+  getPublicContent(page = 1, limit = 10) {
+    return axios.get(API_URL, {
+      params: {
+        page,
+        limit
+      }
+    });
   }
 
   getUserBoard() {
@@ -21,4 +26,4 @@ class UserService {
   }
 }
 
-export default new UserService();
+export default new OrgService();

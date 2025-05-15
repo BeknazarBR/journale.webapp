@@ -26,11 +26,11 @@ const email = value => {
   }
 };
 
-const vusername = value => {
+const vfio = value => {
   if (value.length < 3 || value.length > 20) {
     return (
       <div className="alert alert-danger" role="alert">
-        The username must be between 3 and 20 characters.
+        The fio must be between 3 and 20 characters.
       </div>
     );
   }
@@ -55,7 +55,7 @@ export default class Register extends Component {
     this.onChangePassword = this.onChangePassword.bind(this);
 
     this.state = {
-      username: "",
+      fio: "",
       email: "",
       password: "",
       successful: false,
@@ -65,7 +65,7 @@ export default class Register extends Component {
 
   onChangeUsername(e) {
     this.setState({
-      username: e.target.value
+      fio: e.target.value
     });
   }
 
@@ -93,7 +93,7 @@ export default class Register extends Component {
 
     if (this.checkBtn.context._errors.length === 0) {
       AuthService.register(
-        this.state.username,
+        this.state.fio,
         this.state.email,
         this.state.password
       ).then(
@@ -139,14 +139,14 @@ export default class Register extends Component {
             {!this.state.successful && (
               <div>
                 <div className="form-group">
-                  <label htmlFor="username">Username</label>
+                  <label htmlFor="fio">Username</label>
                   <Input
                     type="text"
                     className="form-control"
-                    name="username"
-                    value={this.state.username}
+                    name="fio"
+                    value={this.state.fio}
                     onChange={this.onChangeUsername}
-                    validations={[required, vusername]}
+                    validations={[required, vfio]}
                   />
                 </div>
 
