@@ -9,7 +9,13 @@ class OrgService {
       params: {
         page,
         limit
-      }
+      },
+      headers: authHeader(),
+    });
+  }
+  create(data) {
+    return axios.post(API_URL, data, {
+      headers: authHeader(),
     });
   }
 

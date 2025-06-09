@@ -18,6 +18,16 @@ class BookService {
       headers: authHeader(),
     });
   }
+  getOrgBookings(page = 1, limit = 10, orgId) {
+    return axios.get(API_URL + '/org/appointments', {
+      params: {
+        page,
+        limit,
+        org_id: orgId
+      },
+      headers: authHeader(),
+    });
+  }
 }
 
 export default new BookService();

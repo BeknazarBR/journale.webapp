@@ -20,6 +20,7 @@ import ServicesPage from './components/services.component';
 import SpecialistsComponent from './components/specialists.component';
 import SpecialistServiceComponent from './components/specialist-service.component';
 import BookingsPage from './components/booking.component';
+import AppointmentsPage from "./components/appointments.component";
 
 class App extends Component {
   constructor(props) {
@@ -80,7 +81,7 @@ class App extends Component {
                 {showUserBoard ? (
                     <>
                       <NavDropdown title={currentUser.fio} id="user-nav-dropdown" align="end">
-                        <NavDropdown.Item as={Link} to="/logout">Logout</NavDropdown.Item>
+                        <NavDropdown.Item onClick={this.logOut}>Logout</NavDropdown.Item>
                       </NavDropdown>
                     </>
                 ) : (
@@ -104,6 +105,7 @@ class App extends Component {
             <Route path="/specialists" element={<SpecialistsComponent />} />
             <Route path="/specialist/services" element={<SpecialistServiceComponent />} />
             <Route path="/bookings" element={<BookingsPage />} />
+            <Route path="/appointments" element={<AppointmentsPage />} />
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/admin" element={<BoardAdmin />} />
           </Routes>
