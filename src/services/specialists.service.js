@@ -1,4 +1,5 @@
 import axios from 'axios';
+import authHeader from "./auth-header";
 
 const API_URL = 'http://localhost:3000/specialists';
 
@@ -10,6 +11,16 @@ class ServicesService {
         page,
         limit
       }
+    });
+  }
+  create(data) {
+    return axios.post(API_URL, data, {
+      headers: authHeader(),
+    })
+  }
+  assignService(data) {
+    return axios.post(API_URL + '/assign-service', data, {
+      headers: authHeader(),
     });
   }
 }

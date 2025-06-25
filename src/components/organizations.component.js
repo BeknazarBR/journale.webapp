@@ -112,7 +112,7 @@ export default class OrganizationsPage extends Component {
     return (
         <div className="container py-4">
           <div className="d-flex justify-content-between align-items-center mb-4">
-            <h2 className="mb-0">Organizations</h2>
+            <h2 className="mb-0">Организации</h2>
             <Button variant="success" onClick={this.handleShowModal}>
               + Добавить
             </Button>

@@ -1,5 +1,5 @@
 import React, { Component, createRef } from 'react';
-import { Spinner, Card, Alert } from 'react-bootstrap';
+import {Spinner, Card, Alert, Modal, Button} from 'react-bootstrap';
 import ServicesService from '../services/services.service';
 import { withRouter } from '../utils/withRouter';
 
@@ -15,6 +15,8 @@ class ServicesPage extends Component {
             error: null,
             page: 1,
             organizationId: null,
+            showAddModal: false,
+            newService: { title: '', price: '', description: '' },
         };
         this.lastCardRef = createRef();
         this.observer = null;
@@ -87,6 +89,37 @@ class ServicesPage extends Component {
         }
     };
 
+    updateNewServiceField = (field, value) => {
+        this.setState((prevState) => ({
+            newService: { ...prevState.newService, [field]: value },
+        }));
+    };
+
+    handleAddService = async (e) => {
+        e.preventDefault();
+
+        const { newService, organizationId } = this.state;
+
+        try {
+            const payload = {
+                ...newService,
+                organization_id: organizationId,
+            };
+
+            const created = await ServicesService.create(payload);
+
+            this.setState((prevState) => ({
+                services: [created.data || created, ...prevState.services],
+                showAddModal: false,
+                newService: { title: '', price: '', description: '' },
+            }));
+        } catch (err) {
+            console.error(err);
+            alert('Ошибка при добавлении услуги');
+        }
+    };
+
+
     render() {
         const { services, loading, error, hasMore } = this.state;
 
@@ -100,7 +133,65 @@ class ServicesPage extends Component {
 
         return (
             <div className="container py-4">
-                <h2 className="mb-4">Услуги организации</h2>
+                <Modal
+                    show={this.state.showAddModal}
+                    onHide={() => this.setState({showAddModal: false})}
+                >
+                    <Modal.Header closeButton>
+                        <Modal.Title>Добавить услугу</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <form onSubmit={this.handleAddService}>
+                            <div className="mb-3">
+                                <label className="form-label">Название</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    value={this.state.newService.title}
+                                    onChange={(e) =>
+                                        this.updateNewServiceField('title', e.target.value)
+                                    }
+                                    required
+                                />
+                            </div>
+                            <div className="mb-3">
+                                <label className="form-label">Цена</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    value={this.state.newService.price}
+                                    onChange={(e) =>
+                                        this.updateNewServiceField('price', e.target.value)
+                                    }
+                                    required
+                                />
+                            </div>
+                            <div className="mb-3">
+                                <label className="form-label">Описание</label>
+                                <textarea
+                                    className="form-control"
+                                    value={this.state.newService.description}
+                                    onChange={(e) =>
+                                        this.updateNewServiceField('description', e.target.value)
+                                    }
+                                    required
+                                />
+                            </div>
+                            <button type="submit" className="btn btn-success">
+                                Сохранить
+                            </button>
+                        </form>
+                    </Modal.Body>
+                </Modal>
+                <div className="d-flex justify-content-between align-items-center mb-4">
+                    <h2 className="mb-0">Услуги организации</h2>
+                    <Button
+                        variant="success"
+                        onClick={() => this.setState({showAddModal: true})}
+                    >
+                        + Добавить
+                    </Button>
+                </div>
                 {services.length === 0 && !loading ? (
                     <Alert variant="info">Услуг пока нет</Alert>
                 ) : (
@@ -127,7 +218,7 @@ class ServicesPage extends Component {
 
                 {loading && (
                     <div className="text-center mt-4">
-                        <Spinner animation="border" variant="primary" />
+                        <Spinner animation="border" variant="primary"/>
                     </div>
                 )}
 

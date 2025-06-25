@@ -1,10 +1,23 @@
 import React, { Component, createRef } from 'react';
-import { Spinner, Card, Alert, Button } from 'react-bootstrap';
+import {Spinner, Card, Alert, Button, Modal, Form} from 'react-bootstrap';
 import SpecialistsService from '../services/specialists.service';
 import { withRouter } from '../utils/withRouter';
 import { Link } from 'react-router-dom';
+import * as PropTypes from "prop-types";
+import AssignServiceModal from "./assign-serivce.modal";
 
 const ITEMS_PER_PAGE = 10;
+
+function Mo(props) {
+    return null;
+}
+
+Mo.propTypes = {
+    show: PropTypes.func,
+    onHide: PropTypes.func,
+    centered: PropTypes.bool,
+    children: PropTypes.node
+};
 
 class SpecialistsPage extends Component {
     constructor(props) {
@@ -16,6 +29,10 @@ class SpecialistsPage extends Component {
             error: null,
             page: 1,
             organizationId: null,
+            showModal: false,
+            fio: '',
+            showAssignModal: false,
+            currentSpecialistId: null,
         };
         this.lastCardRef = createRef();
         this.observer = null;
@@ -44,7 +61,15 @@ class SpecialistsPage extends Component {
             this.initObserver();
         }
     }
-
+    handleShowModal = () => this.setState({ showModal: true });
+    handleCloseModal = () => this.setState({ showModal: false, fio: "" });
+    handleFioChange = (e) => this.setState({ fio: e.target.value });
+    handleAddSpecialist = async () => {
+        const { fio, organizationId } = this.state;
+        if (!fio.trim()) return;
+        await SpecialistsService.create({ fio, organization_id: organizationId });
+        this.setState({ specialists: [], page: 1, hasMore: true, showModal: false, fio: "" }, this.loadMore);
+    };
     initObserver() {
         if (this.observer) this.observer.disconnect();
 
@@ -101,7 +126,50 @@ class SpecialistsPage extends Component {
 
         return (
             <div className="container py-4">
-                <h2 className="mb-4">Специалисты организации</h2>
+                <Modal show={this.state.showModal} onHide={this.handleCloseModal} centered>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Добавить специалиста</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form.Group>
+                            <Form.Label>ФИО</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="Введите ФИО"
+                                value={this.state.fio}
+                                onChange={this.handleFioChange}
+                            />
+                        </Form.Group>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={this.handleCloseModal}>
+                            Отмена
+                        </Button>
+                        <Button variant="primary" onClick={this.handleAddSpecialist}>
+                            Сохранить
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+                <AssignServiceModal
+                    show={this.state.showAssignModal}
+                    onHide={() => this.setState({ showAssignModal: false })}
+                    organizationId={this.state.organizationId}
+                    onAssign={async ({ service_id, duration }) => {
+                        await SpecialistsService.assignService({
+                            specialist_id: this.state.currentSpecialistId,
+                            service_id,
+                            duration,
+                        });
+                        this.setState({ showAssignModal: false });
+                        // Обновить список специалистов/услуг, если надо
+                    }}
+                />
+                <div className="d-flex justify-content-between align-items-center mb-4">
+                    <h2 className="mb-0">Специалисты организации</h2>
+                    <Button onClick={this.handleShowModal} variant="success">
+                        Добавить специалиста
+                    </Button>
+                </div>
                 {specialists.length === 0 && !loading ? (
                     <Alert variant="info">Специалистов пока нет</Alert>
                 ) : (
@@ -132,6 +200,12 @@ class SpecialistsPage extends Component {
                                             >
                                                 Услуги
                                             </Button>
+                                            <Button
+                                                variant="secondary"
+                                                onClick={() => this.setState({ showAssignModal: true, currentSpecialistId: spec._id })}
+                                            >
+                                                Добавить услугу
+                                            </Button>
                                         </div>
                                     </Card.Body>
                                 </Card>
@@ -142,7 +216,7 @@ class SpecialistsPage extends Component {
 
                 {loading && (
                     <div className="text-center mt-4">
-                        <Spinner animation="border" variant="primary" />
+                        <Spinner animation="border" variant="primary"/>
                     </div>
                 )}
 
